@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -21,6 +22,21 @@ export async function POST(request: Request) {
     // =========================
 
     const apiKey = process.env.GROQ_API_KEY;
+    const e1 = process.env.e1;
+    const e2 = process.env.e2;
+    const e3 = process.env.e3;
+    const a1 = process.env.a1;
+    const a2 = process.env.a2;
+    const a3 = process.env.a3;
+    const a4 = process.env.a4;
+    const r1 = process.env.r1;
+    const r2 = process.env.r2;
+    const r3 = process.env.r3;
+    const c = process.env.c;
+    const c2 = process.env.c2;
+    const con2 = process.env.con2
+    const API = process.env.API
+    const model = process.env.model
 
     if (!apiKey) {
       return NextResponse.json(
@@ -38,7 +54,7 @@ export async function POST(request: Request) {
     // EXPLAIN CODE
     // =========================
 
-    if (action === "explain") {
+    if (action === a1) {
       if (!code?.trim()) {
         return NextResponse.json(
           {
@@ -48,30 +64,14 @@ export async function POST(request: Request) {
         );
       }
 
-      prompt = `
-You are CodeMentor AI, a friendly AI coding mentor.
-
-Explain the following ${language} code in simple, beginner-friendly language.
-
-Include:
-
-1. What the code does
-2. Step-by-step explanation
-3. Important concepts used
-4. Simple example if helpful
-5. Tips for improving the code
-
-Code:
-
-${code}
-`;
+      prompt = e1 || '';
     }
 
     // =========================
     // DEBUG CODE
     // =========================
 
-    else if (action === "debug") {
+    else if (action === a2) {
       if (!code?.trim()) {
         return NextResponse.json(
           {
@@ -81,39 +81,14 @@ ${code}
         );
       }
 
-      prompt = `
-You are an expert programming mentor.
-
-Analyze the following ${language} code and find bugs.
-
-Return your response EXACTLY in this format:
-
-ERRORS:
-List all errors clearly.
-
-WHY:
-Explain why these errors happen.
-
-FIXED_CODE:
-Provide the complete corrected code only.
-
-CONCEPT:
-Explain the important programming concept related to the mistake.
-
-TIP:
-Give one useful improvement tip.
-
-Code:
-
-${code}
-`;
+      prompt = e2 || '';
     }
 
     // =========================
     // CHECK PRACTICE SOLUTION
     // =========================
 
-    else if (action === "check-solution") {
+    else if (action === a3) {
       if (!code?.trim()) {
         return NextResponse.json(
           {
@@ -123,51 +98,14 @@ ${code}
         );
       }
 
-      prompt = `
-You are CodeMentor AI, reviewing a student's programming solution.
-
-Programming Language:
-${language}
-
-Problem Title:
-${problemTitle}
-
-Problem Description:
-${problemDescription}
-
-Example:
-${example}
-
-Student's Code:
-
-${code}
-
-Analyze whether the solution correctly solves the problem.
-
-Return your response EXACTLY in this format:
-
-VERDICT:
-Correct / Partially Correct / Incorrect
-
-FEEDBACK:
-Give beginner-friendly feedback.
-
-ERRORS:
-Explain any errors or write "No major errors found."
-
-SUGGESTIONS:
-Suggest how the student can improve the solution.
-
-SCORE:
-Give a score out of 10, for example: 8/10
-`;
+      prompt = e3 || '';
     }
 
     // =========================
     // AI CHAT MENTOR
     // =========================
 
-    else if (action === "chat") {
+    else if (action === a4) {
       const userQuestion =
         question?.trim() ||
         message?.trim() ||
@@ -189,77 +127,26 @@ Give a score out of 10, for example: 8/10
 
       const chatMessages = [
         {
-          role: "system",
-          content: `
-You are CodeMentor AI, a friendly, patient and highly knowledgeable AI Coding Mentor.
-
-Your goal is to help students LEARN programming rather than simply give them answers.
-
-Teaching style:
-
-- Explain difficult concepts in simple beginner-friendly language.
-- Use real-world analogies when useful.
-- Give small and clear code examples.
-- Break complicated problems into steps.
-- Encourage the student to think independently.
-- If the student makes a mistake, explain WHY it is wrong.
-- Never make the student feel bad for asking basic questions.
-- Ask a short follow-up question when it would help learning.
-
-You can help with:
-
-- Programming fundamentals
-- JavaScript
-- TypeScript
-- React
-- Next.js
-- Node.js
-- Python
-- Java
-- C
-- C++
-- HTML
-- CSS
-- SQL
-- MongoDB
-- Data Structures
-- Algorithms
-- AI / ML basics
-- Debugging
-- Web development
-- Computer science concepts
-- Coding interview preparation
-
-When explaining code:
-
-1. Explain what it does.
-2. Explain how it works.
-3. Explain important concepts.
-4. Give an example.
-5. Give a small tip for remembering the concept.
-
-Keep answers clear and structured.
-
-Use Markdown formatting when useful.
-`,
+          role: r1,
+          content: c || "",
         },
         ...conversationHistory
           .filter(
             (msg: any) =>
               msg &&
-              (msg.role === "user" || msg.role === "assistant") &&
-              typeof msg.content === "string"
+              (msg.role === r2 || msg.role === r2) &&
+              typeof msg.content === con2
           )
           .slice(-10),
         {
-          role: "user",
+          role: r2,
           content: userQuestion,
         },
       ];
 
       // Directly use conversation history
       const response = await fetch(
-        "https://api.groq.com/openai/v1/chat/completions",
+        `${API}`,
         {
           method: "POST",
 
@@ -269,7 +156,7 @@ Use Markdown formatting when useful.
           },
 
           body: JSON.stringify({
-            model: "openai/gpt-oss-20b",
+            model: `${model}`,
 
             messages: chatMessages,
 
@@ -333,7 +220,7 @@ Use Markdown formatting when useful.
     // =========================
 
     const response = await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
+      `${API}`,
       {
         method: "POST",
 
@@ -343,17 +230,17 @@ Use Markdown formatting when useful.
         },
 
         body: JSON.stringify({
-          model: "openai/gpt-oss-20b",
+          model: `${model}`,
 
           messages: [
             {
-              role: "system",
+              role: r1,
               content:
-                "You are CodeMentor AI, an intelligent, helpful and beginner-friendly AI coding mentor.",
+                c2,
             },
 
             {
-              role: "user",
+              role: r2,
               content: prompt,
             },
           ],
