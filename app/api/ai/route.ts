@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 
-
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -37,6 +36,8 @@ export async function POST(request: Request) {
     const con2 = process.env.con2
     const API = process.env.API
     const model = process.env.model
+    const t = process.env.t
+    const mt = process.env.mt
 
     if (!apiKey) {
       return NextResponse.json(
@@ -160,9 +161,9 @@ export async function POST(request: Request) {
 
             messages: chatMessages,
 
-            temperature: 0.7,
+            temperature: t,
 
-            max_tokens: 2000,
+            max_tokens: mt,
           }),
         }
       );
@@ -245,9 +246,9 @@ export async function POST(request: Request) {
             },
           ],
 
-          temperature: 0.7,
+          temperature: t,
 
-          max_tokens: 2000,
+          max_tokens: mt,
         }),
       }
     );
